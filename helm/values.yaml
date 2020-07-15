@@ -1,0 +1,39 @@
+# Default values for the microservice.
+# This is a YAML-formatted file.
+# Declare variables to be passed into the templates.
+
+
+env: dev
+
+ingress:
+  enabled: false
+
+envVars:  
+
+image:
+  repository: <repo name>
+  tag: latest
+  pullPolicy: IfNotPresent
+
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+  containerPort: 3000
+
+resources: 
+  limits:
+    cpu: 100m
+    memory: 200Mi
+  requests:
+    cpu: 100m
+    memory: 200Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

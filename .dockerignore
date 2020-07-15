@@ -1,0 +1,8 @@
+docs
+assets
+.env
+.gitignore
+.npmrc
+Makefile
+node_modules
+results.xml

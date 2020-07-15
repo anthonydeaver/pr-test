@@ -1,0 +1,71 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "k8s.fullname" . }}
+  labels:
+    app: {{ include "k8s.name" . }}
+    chart: {{ include "k8s.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    releaseVersion: {{ include "k8s.appVersion" . }}
+{{- if .Values.labels }}
+{{ toYaml .Values.labels | indent 4 }}
+{{- end }}
+spec:
+  replicas: {{ (index .Values.replicaCount .Values.env) }}
+  revisionHistoryLimit: {{ (index .Values.historyLimit .Values.env) }}
+  selector:
+    matchLabels:
+      app: {{ include "k8s.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "k8s.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      imagePullSecrets:
+        - name: imageRepoCred
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}/{{ include "k8s.name" . }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.containerPort }}
+              protocol: TCP
+          # Disabled since it's a run and done
+          # livenessProbe:
+          #   failureThreshold: 3
+          #   periodSeconds: 10
+          #   successThreshold: 1
+          #   timeoutSeconds: 1
+          #   initialDelaySeconds: 35
+          #   httpGet:
+          #     path: /health
+          #     port: http
+          # readinessProbe:
+          #   initialDelaySeconds: 35
+          #   failureThreshold: 3
+          #   periodSeconds: 10
+          #   successThreshold: 1
+          #   timeoutSeconds: 1
+          #   httpGet:
+          #     path: /health
+          #     port: http
+          env:
+{{ toYaml .Values.envVars | indent 12 }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
