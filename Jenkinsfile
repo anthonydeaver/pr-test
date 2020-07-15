@@ -9,7 +9,7 @@ def REPO = env.REPO_URL
       imageTag = "${branch}-${VERSION}.${BUILD_ID}-${latestdate.getTime()}"
       println("name: ${serviceName}")
       println("tag: ${imageTag}")
-      docker.withRegistry(REPO, 'Artifactory') {
+      docker.withRegistry(REPO, '<repo creds>') {
         DOCKER_IMAGE = docker.build("${serviceName}:${imageTag}")
       }
     }
